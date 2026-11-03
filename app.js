@@ -870,7 +870,12 @@ import { toggleMusic } from "./music.js";
     sandboxLoader.hidden = false;
     sandboxFallback.hidden = true;
     sandboxPromise = (async () => {
-      const mod = await import("./scene3d.js");
+      let importTimer = 0;
+      const importTimeout = new Promise((_, reject) => {
+        importTimer = window.setTimeout(() => reject(new Error("三维模块加载超时")), 12000);
+      });
+      const mod = await Promise.race([import("./scene3d.js"), importTimeout]);
+      window.clearTimeout(importTimer);
       const ok = mod.initSandbox({
         canvas: sandboxCanvas,
         container: sandboxEl,
@@ -967,7 +972,12 @@ import { toggleMusic } from "./music.js";
       }
       if (entries.some(entry => entry.isIntersecting) && currentView === "2d") {
         formationObserver.disconnect();
-        setView("3d");
+        // 通过真实按钮事件切换，避免在观察器回调中直接初始化 WebGL 的竞态。
+        window.setTimeout(() => {
+          if (!userSetView && currentView === "2d") {
+            document.querySelector('#viewToggle button[data-view="3d"]')?.click();
+          }
+        }, 220);
       }
     }, { threshold: .12 });
     const section = document.getElementById("formation");
