@@ -905,6 +905,16 @@ import { toggleMusic } from "./music.js";
     }
   }
 
+  window.__sandboxDebug = () => ({
+    currentView,
+    hasPromise: !!sandboxPromise,
+    hasApi: !!sandboxApi,
+    loaderHidden: sandboxLoader?.hidden,
+    fallbackHidden: sandboxFallback?.hidden,
+    readyState: document.readyState
+  });
+  window.__ensureSandbox = ensureSandbox;
+
   function setView(view) {
     if (view !== "3d" && view !== "2d") return;
     currentView = view;
