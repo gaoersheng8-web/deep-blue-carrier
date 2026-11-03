@@ -905,16 +905,6 @@ import { toggleMusic } from "./music.js";
     }
   }
 
-  window.__sandboxDebug = () => ({
-    currentView,
-    hasPromise: !!sandboxPromise,
-    hasApi: !!sandboxApi,
-    loaderHidden: sandboxLoader?.hidden,
-    fallbackHidden: sandboxFallback?.hidden,
-    readyState: document.readyState
-  });
-  window.__ensureSandbox = ensureSandbox;
-
   function setView(view) {
     if (view !== "3d" && view !== "2d") return;
     currentView = view;
@@ -969,29 +959,6 @@ import { toggleMusic } from "./music.js";
   }
   if (sandboxFallback) {
     sandboxFallback.querySelector("#fallback2d")?.addEventListener("click", () => setView("2d"));
-  }
-
-  const default3dEligible = window.innerWidth >= 1024
-    && !reducedMotion
-    && !window.matchMedia("(pointer: coarse)").matches;
-  if (default3dEligible && "IntersectionObserver" in window) {
-    const formationObserver = new IntersectionObserver(entries => {
-      if (userSetView) {
-        formationObserver.disconnect();
-        return;
-      }
-      if (entries.some(entry => entry.isIntersecting) && currentView === "2d") {
-        formationObserver.disconnect();
-        // 通过真实按钮事件切换，避免在观察器回调中直接初始化 WebGL 的竞态。
-        window.setTimeout(() => {
-          if (!userSetView && currentView === "2d") {
-            document.querySelector('#viewToggle button[data-view="3d"]')?.click();
-          }
-        }, 220);
-      }
-    }, { threshold: .12 });
-    const section = document.getElementById("formation");
-    if (section) formationObserver.observe(section);
   }
 
   function mapStyleFor(ship) {
