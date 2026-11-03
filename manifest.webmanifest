@@ -1,0 +1,20 @@
+{
+  "name": "深蓝档案 · 中国航母编队",
+  "short_name": "深蓝档案",
+  "description": "以交互式编队图、航母图鉴与时间轴，呈现中国航母编队的公开发展脉络。",
+  "lang": "zh-CN",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#04090e",
+  "theme_color": "#04090e",
+  "icons": [
+    {
+      "src": "assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

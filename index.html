@@ -1,0 +1,972 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#04090e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="description" content="深蓝档案：以交互式编队图、航母图鉴与时间轴，呈现中国航母编队的公开发展脉络。">
+  <meta property="og:title" content="深蓝 · 中国航母编队">
+  <meta property="og:description" content="从近海到深蓝，一份可交互的中国航母公开档案。">
+  <title>深蓝 · 中国航母编队 | DEEP BLUE ARCHIVE</title>
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+  <script type="importmap">{"imports":{"three":"./vendor/three.module.min.js","three/addons/":"./vendor/addons/"}}</script>
+  <noscript><style>.reveal,.hero-reveal{opacity:1!important;transform:none!important}</style></noscript>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳至主要内容</a>
+  <div class="noise" aria-hidden="true"></div>
+  <div class="scroll-progress" aria-hidden="true"><span id="progressBar"></span></div>
+
+  <!-- ── SVG 图形库 ───────────────────────────────────────── -->
+  <svg class="svg-sprite" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="deckGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#4a646a"/>
+        <stop offset=".48" stop-color="#30464c"/>
+        <stop offset="1" stop-color="#1b2e34"/>
+      </linearGradient>
+      <linearGradient id="hullGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#2f454b"/>
+        <stop offset="1" stop-color="#15252b"/>
+      </linearGradient>
+      <linearGradient id="escortGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#40595f"/>
+        <stop offset="1" stop-color="#1b2e34"/>
+      </linearGradient>
+      <linearGradient id="wakeGrad" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#7fe3e8" stop-opacity="0"/>
+        <stop offset="1" stop-color="#7fe3e8" stop-opacity=".45"/>
+      </linearGradient>
+      <radialGradient id="sweepGrad">
+        <stop offset="0" stop-color="#6fe3e8" stop-opacity=".38"/>
+        <stop offset="1" stop-color="#6fe3e8" stop-opacity="0"/>
+      </radialGradient>
+      <filter id="softGlow" x="-40%" y="-40%" width="180%" height="180%">
+        <feGaussianBlur stdDeviation="3" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <pattern id="mapGrid" width="50" height="50" patternUnits="userSpaceOnUse">
+        <path d="M50 0H0V50" fill="none" stroke="#89c7d2" stroke-opacity=".07" stroke-width="1"/>
+      </pattern>
+      <pattern id="mapGridBig" width="250" height="250" patternUnits="userSpaceOnUse">
+        <path d="M250 0H0V250" fill="none" stroke="#89c7d2" stroke-opacity=".1" stroke-width="1"/>
+      </pattern>
+
+      <!-- 航母 · 共用甲板 -->
+      <g id="carrier-base-art">
+        <path d="M62 236L158 270L1078 260L1188 212L1158 180L1020 142L936 112L164 108L62 164Z" fill="#02080c" opacity=".62"/>
+        <path d="M78 224L188 258L972 248L1108 216L1174 182L1110 152L970 124L186 126L78 188Z" fill="#061018" opacity=".8"/>
+        <path d="M72 188L168 112L946 108L1098 138L1180 180L1112 216L970 240L774 248L190 252L72 220Z" fill="url(#deckGrad)" stroke="#a8c1c5" stroke-opacity=".62" stroke-width="1.6"/>
+        <path d="M60 176L166 112L770 238L756 252L54 200Z" fill="#1a2c31" fill-opacity=".66" stroke="#8da5aa" stroke-opacity=".3"/>
+        <path d="M168 112L946 108" fill="none" stroke="#d8e8e8" stroke-opacity=".28" stroke-width="1.4"/>
+        <path d="M106 168L752 240" fill="none" stroke="#e7cf9d" stroke-opacity=".34" stroke-width="2.2" stroke-dasharray="22 14"/>
+        <path d="M96 184L760 254" fill="none" stroke="#e7cf9d" stroke-opacity=".2" stroke-width="2.2" stroke-dasharray="22 14"/>
+        <path d="M116 178L752 248" fill="none" stroke="#e9f4f3" stroke-opacity=".1" stroke-width="1"/>
+        <path d="M226 208H1082" fill="none" stroke="#e5f1f2" stroke-opacity=".26" stroke-width="2" stroke-dasharray="28 20"/>
+        <g fill="none" stroke="#93adb2" stroke-opacity=".4" stroke-width="1.3">
+          <rect x="176" y="112" width="76" height="24" rx="1.5"/>
+          <rect x="430" y="110" width="54" height="18" rx="1.5"/>
+          <rect x="842" y="230" width="70" height="16" rx="1.5"/>
+          <path d="M82 206L176 238M880 238H904M446 114H468"/>
+        </g>
+        <g fill="#b8c9cb" opacity=".36">
+          <circle cx="254" cy="136" r="2"/><circle cx="282" cy="136" r="2"/><circle cx="310" cy="136" r="2"/>
+          <circle cx="338" cy="136" r="2"/><circle cx="366" cy="136" r="2"/><circle cx="394" cy="136" r="2"/>
+          <circle cx="422" cy="136" r="2"/><circle cx="450" cy="136" r="2"/><circle cx="478" cy="136" r="2"/>
+        </g>
+
+        <g class="deck-aircraft" fill="#e5efee" stroke="#071116" stroke-width=".7">
+          <path d="M0 -16L2.5 -5L7 -3L11 0L22 7L22 11L8 8L7 15L12 19L12 22L0 20L-12 22L-12 19L-7 15L-8 8L-22 11L-22 7L-11 0L-7 -3L-2.5 -5Z" transform="translate(262 174) rotate(90) scale(1.35)"/>
+          <path d="M0 -16L2.5 -5L7 -3L11 0L22 7L22 11L8 8L7 15L12 19L12 22L0 20L-12 22L-12 19L-7 15L-8 8L-22 11L-22 7L-11 0L-7 -3L-2.5 -5Z" transform="translate(326 172) rotate(90) scale(1.35)"/>
+          <path d="M0 -16L2.5 -5L7 -3L11 0L22 7L22 11L8 8L7 15L12 19L12 22L0 20L-12 22L-12 19L-7 15L-8 8L-22 11L-22 7L-11 0L-7 -3L-2.5 -5Z" transform="translate(390 170) rotate(90) scale(1.35)"/>
+          <path d="M0 -16L2.5 -5L7 -3L11 0L22 7L22 11L8 8L7 15L12 19L12 22L0 20L-12 22L-12 19L-7 15L-8 8L-22 11L-22 7L-11 0L-7 -3L-2.5 -5Z" transform="translate(214 226) rotate(90) scale(1.25)"/>
+          <path d="M0 -16L2.5 -5L7 -3L11 0L22 7L22 11L8 8L7 15L12 19L12 22L0 20L-12 22L-12 19L-7 15L-8 8L-22 11L-22 7L-11 0L-7 -3L-2.5 -5Z" transform="translate(528 150) rotate(90) scale(1.3)"/>
+          <path d="M0 -16L2.5 -5L7 -3L11 0L22 7L22 11L8 8L7 15L12 19L12 22L0 20L-12 22L-12 19L-7 15L-8 8L-22 11L-22 7L-11 0L-7 -3L-2.5 -5Z" transform="translate(586 148) rotate(90) scale(1.3)"/>
+          <path d="M0 -16L2.5 -5L7 -3L11 0L22 7L22 11L8 8L7 15L12 19L12 22L0 20L-12 22L-12 19L-7 15L-8 8L-22 11L-22 7L-11 0L-7 -3L-2.5 -5Z" transform="translate(860 158) rotate(90) scale(1.3)"/>
+          <path d="M0 -16L2.5 -5L7 -3L11 0L22 7L22 11L8 8L7 15L12 19L12 22L0 20L-12 22L-12 19L-7 15L-8 8L-22 11L-22 7L-11 0L-7 -3L-2.5 -5Z" transform="translate(914 156) rotate(90) scale(1.3)"/>
+          <path d="M0 -16L2.5 -5L7 -3L11 0L22 7L22 11L8 8L7 15L12 19L12 22L0 20L-12 22L-12 19L-7 15L-8 8L-22 11L-22 7L-11 0L-7 -3L-2.5 -5Z" transform="translate(620 238) rotate(42) scale(1.2)"/>
+        </g>
+
+        <g id="carrier-island">
+          <path d="M626 228L762 226L794 246L782 286L672 296L628 264Z" fill="#22363c" stroke="#7e9a9f" stroke-opacity=".5" stroke-width="1.2"/>
+          <path d="M660 222L740 220L756 232L744 250L668 252Z" fill="#334c52"/>
+          <rect x="696" y="200" width="26" height="22" fill="#3b565c"/>
+          <rect x="700" y="204" width="18" height="5" fill="#6fe3e8" opacity=".55"/>
+          <line x1="710" y1="200" x2="710" y2="172" stroke="#9ab3b6" stroke-width="2"/>
+          <circle cx="710" cy="169" r="3.6" fill="#d8c18d"/>
+          <line x1="758" y1="232" x2="758" y2="210" stroke="#9ab3b6" stroke-width="1.5"/>
+          <circle cx="758" cy="208" r="2.4" fill="#d8c18d"/>
+          <rect x="746" y="254" width="22" height="16" fill="#3b565c"/>
+          <path d="M646 242H764" stroke="#6fe3e8" stroke-opacity=".5" stroke-width="1.6"/>
+          <path d="M682 270H760" stroke="#d8c18d" stroke-opacity=".3" stroke-width="1.4"/>
+          <rect x="638" y="248" width="18" height="12" fill="#2b444a"/>
+        </g>
+
+        <path d="M72 220L190 252L774 248" fill="none" stroke="#d6e5e5" stroke-opacity=".15" stroke-width="1.2"/>
+        <path d="M52 204L148 232" stroke="url(#wakeGrad)" stroke-width="2"/>
+      </g>
+
+      <symbol id="ship-carrier-ski" viewBox="0 0 1200 360">
+        <use href="#carrier-base-art"/>
+        <path d="M1032 142Q1114 148 1172 180Q1110 208 1038 218" fill="#2f454a" fill-opacity=".85" stroke="#d0b681" stroke-opacity=".72" stroke-width="3"/>
+        <path d="M1042 156Q1110 162 1152 180" fill="none" stroke="#f0dba9" stroke-opacity=".5" stroke-width="1.4"/>
+        <path d="M1040 166Q1106 172 1138 181" fill="none" stroke="#f0dba9" stroke-opacity=".22" stroke-width="1.2"/>
+        <text x="1018" y="234" fill="#d8c18d" fill-opacity=".5" font-family="monospace" font-size="14" letter-spacing="3">STOBAR</text>
+      </symbol>
+
+      <!-- 航母 · 电磁弹射甲板 -->
+      <symbol id="ship-carrier-cat" viewBox="0 0 1200 360">
+        <use href="#carrier-base-art"/>
+        <g fill="none" stroke="#f0dba9" stroke-opacity=".5" stroke-width="2" stroke-dasharray="26 9">
+          <path d="M788 160L1150 177"/>
+          <path d="M788 184L1132 184"/>
+          <path d="M788 208L1118 192"/>
+        </g>
+        <g fill="#f0dba9" opacity=".7">
+          <rect x="780" y="156" width="9" height="8"/>
+          <rect x="780" y="180" width="9" height="8"/>
+          <rect x="780" y="204" width="9" height="8"/>
+        </g>
+        <path d="M1056 142L1152 166" stroke="#6fe3e8" stroke-opacity=".35" stroke-width="2"/>
+        <path d="M1058 216L1150 194" stroke="#6fe3e8" stroke-opacity=".22" stroke-width="2"/>
+        <text x="916" y="230" fill="#f0dba9" fill-opacity=".55" font-family="monospace" font-size="13" letter-spacing="3">EMALS / 003</text>
+      </symbol>
+
+      <!-- 055 型驱逐舰 -->
+      <symbol id="ship-055" viewBox="0 0 360 100">
+        <path d="M14 51L60 34L84 41" fill="none" stroke="url(#wakeGrad)" stroke-width="2"/>
+        <path d="M30 50L70 27L292 29L332 44L346 50L332 57L292 71L70 73Z" fill="url(#escortGrad)" stroke="#7b969b" stroke-opacity=".5"/>
+        <path d="M104 36H260L282 50L260 64H104Z" fill="#30464c"/>
+        <path d="M142 31H206L218 38L206 46H142Z" fill="#3c555b"/>
+        <path d="M164 31V20H192V31" fill="#3c555b"/>
+        <path d="M216 34L236 18L242 18L230 38Z" fill="#6f898e"/>
+        <circle cx="241" cy="24" r="3" fill="#d8c18d"/>
+        <g fill="#6fe3e8" opacity=".55">
+          <rect x="150" y="42" width="8" height="4"/><rect x="162" y="42" width="8" height="4"/>
+          <rect x="174" y="42" width="8" height="4"/><rect x="186" y="42" width="8" height="4"/>
+          <rect x="150" y="49" width="8" height="4"/><rect x="162" y="49" width="8" height="4"/>
+          <rect x="174" y="49" width="8" height="4"/><rect x="186" y="49" width="8" height="4"/>
+        </g>
+        <g fill="#9db4b7" opacity=".55">
+          <rect x="228" y="42" width="5" height="5"/><rect x="238" y="42" width="5" height="5"/>
+          <rect x="248" y="42" width="5" height="5"/><rect x="228" y="50" width="5" height="5"/>
+          <rect x="238" y="50" width="5" height="5"/><rect x="248" y="50" width="5" height="5"/>
+        </g>
+        <circle cx="306" cy="50" r="7" fill="none" stroke="#b9c9c8" stroke-opacity=".6"/>
+        <path d="M306 44V56M300 50H312" stroke="#b9c9c8" stroke-opacity=".5"/>
+        <circle cx="278" cy="50" r="3" fill="#d8c18d"/>
+        <path d="M92 50H124M82 58H124" stroke="#9db4b7" stroke-opacity=".25"/>
+        <text x="60" y="50" fill="#8fa6aa" fill-opacity=".55" font-family="monospace" font-size="11">101</text>
+      </symbol>
+
+      <!-- 052D 型驱逐舰 -->
+      <symbol id="ship-052d" viewBox="0 0 340 94">
+        <path d="M18 47L64 28L80 34" fill="none" stroke="url(#wakeGrad)" stroke-width="2"/>
+        <path d="M30 46L68 25L276 27L316 41L330 47L316 54L276 68L68 69Z" fill="url(#escortGrad)" stroke="#7b969b" stroke-opacity=".45"/>
+        <path d="M108 34H252L270 47L252 60H108Z" fill="#2c4248"/>
+        <path d="M150 29H198L210 36L198 44H150Z" fill="#3b545a"/>
+        <path d="M170 29V18H188V29" fill="#3b545a"/>
+        <path d="M208 36L226 22L232 22L220 40Z" fill="#6f898e"/>
+        <circle cx="228" cy="24" r="2.5" fill="#d8c18d"/>
+        <g fill="#6fe3e8" opacity=".48">
+          <rect x="132" y="43" width="7" height="4"/><rect x="143" y="43" width="7" height="4"/>
+          <rect x="154" y="43" width="7" height="4"/><rect x="132" y="50" width="7" height="4"/>
+          <rect x="143" y="50" width="7" height="4"/><rect x="154" y="50" width="7" height="4"/>
+        </g>
+        <circle cx="294" cy="47" r="6.5" fill="none" stroke="#b9c9c8" stroke-opacity=".55"/>
+        <circle cx="268" cy="47" r="2.6" fill="#d8c18d"/>
+        <path d="M86 47H112" stroke="#9db4b7" stroke-opacity=".25"/>
+      </symbol>
+
+      <!-- 054A 型护卫舰 -->
+      <symbol id="ship-054a" viewBox="0 0 300 82">
+        <path d="M18 41L54 25" fill="none" stroke="url(#wakeGrad)" stroke-width="2"/>
+        <path d="M28 40L60 22L240 24L278 37L292 41L278 47L240 59L60 60Z" fill="url(#escortGrad)" stroke="#7b969b" stroke-opacity=".42"/>
+        <path d="M96 31H218L232 41L218 52H96Z" fill="#2c4248"/>
+        <path d="M130 26H174L184 32L174 39H130Z" fill="#3b545a"/>
+        <path d="M148 26V16H164V26" fill="#3b545a"/>
+        <path d="M182 33L198 20L203 20L193 36Z" fill="#6f898e"/>
+        <g fill="#6fe3e8" opacity=".46">
+          <rect x="112" y="38" width="6" height="4"/><rect x="122" y="38" width="6" height="4"/>
+          <rect x="132" y="38" width="6" height="4"/><rect x="112" y="45" width="6" height="4"/>
+          <rect x="122" y="45" width="6" height="4"/><rect x="132" y="45" width="6" height="4"/>
+        </g>
+        <circle cx="258" cy="41" r="6" fill="none" stroke="#b9c9c8" stroke-opacity=".5"/>
+        <path d="M80 41H104" stroke="#9db4b7" stroke-opacity=".25"/>
+      </symbol>
+
+      <!-- 901 型综合补给舰 -->
+      <symbol id="ship-901" viewBox="0 0 440 110">
+        <path d="M16 55L58 31" fill="none" stroke="url(#wakeGrad)" stroke-width="2"/>
+        <path d="M34 54L78 30L360 32L402 47L418 55L402 64L360 79L78 80Z" fill="url(#escortGrad)" stroke="#7b969b" stroke-opacity=".45"/>
+        <path d="M92 40H178L190 55L178 70H92Z" fill="#2d444a"/>
+        <path d="M220 38H300L312 55L300 72H220Z" fill="#2d444a"/>
+        <path d="M122 35H158V44H122Z" fill="#3c555b"/>
+        <path d="M146 35V21H158V35" fill="#3c555b"/>
+        <path d="M248 33H280V42H248Z" fill="#3c555b"/>
+        <path d="M264 33V19H276V33" fill="#3c555b"/>
+        <path d="M184 42L210 26L214 26L204 44Z" fill="#6f898e"/>
+        <path d="M330 40H356V70H330Z" fill="none" stroke="#9db4b7" stroke-opacity=".45"/>
+        <path d="M332 48H354M332 58H354M342 40V70" stroke="#9db4b7" stroke-opacity=".3"/>
+        <g fill="#6fe3e8" opacity=".45">
+          <rect x="100" y="50" width="8" height="4"/><rect x="112" y="50" width="8" height="4"/>
+          <rect x="124" y="50" width="8" height="4"/><rect x="136" y="50" width="8" height="4"/>
+        </g>
+        <circle cx="386" cy="55" r="7" fill="none" stroke="#b9c9c8" stroke-opacity=".5"/>
+      </symbol>
+
+      <!-- 054B 型护卫舰 -->
+      <symbol id="ship-054b" viewBox="0 0 310 84">
+        <path d="M18 43L56 26" fill="none" stroke="url(#wakeGrad)" stroke-width="2"/>
+        <path d="M28 42L62 23L246 25L284 38L300 43L284 49L246 61L62 62Z" fill="url(#escortGrad)" stroke="#7b969b" stroke-opacity=".42"/>
+        <path d="M98 32H214L232 43L214 54H98Z" fill="#2c4248"/>
+        <path d="M128 27H176L187 33L176 40H128Z" fill="#3b545a"/>
+        <path d="M146 27V16H170V27" fill="#3b545a"/>
+        <path d="M178 33L206 20L212 21L196 38Z" fill="#6f898e"/>
+        <path d="M152 33H164V40H152Z" fill="#6fe3e8" opacity=".35"/>
+        <g fill="#6fe3e8" opacity=".46">
+          <rect x="108" y="39" width="6" height="4"/><rect x="118" y="39" width="6" height="4"/>
+          <rect x="128" y="39" width="6" height="4"/><rect x="108" y="46" width="6" height="4"/>
+          <rect x="118" y="46" width="6" height="4"/><rect x="128" y="46" width="6" height="4"/>
+        </g>
+        <circle cx="262" cy="43" r="6" fill="none" stroke="#b9c9c8" stroke-opacity=".5"/>
+        <path d="M80 43H104" stroke="#9db4b7" stroke-opacity=".25"/>
+      </symbol>
+
+      <!-- 075 型两栖攻击舰 -->
+      <symbol id="ship-075" viewBox="0 0 460 118">
+        <path d="M16 61L78 31" fill="none" stroke="url(#wakeGrad)" stroke-width="2"/>
+        <path d="M34 57L86 24L408 27L438 50L452 58L438 72L402 94L86 96Z" fill="url(#escortGrad)" stroke="#7b969b" stroke-opacity=".45"/>
+        <path d="M58 37L404 38L432 58L402 82L58 80Z" fill="#31464c" stroke="#8fa8ac" stroke-opacity=".45"/>
+        <path d="M76 45H390" stroke="#dcebed" stroke-opacity=".18" stroke-dasharray="15 11"/>
+        <path d="M300 78L356 76L368 86L352 100L300 98Z" fill="#263b41" stroke="#7e9a9f" stroke-opacity=".5"/>
+        <rect x="314" y="70" width="26" height="12" fill="#3b565c"/>
+        <line x1="327" y1="70" x2="327" y2="58" stroke="#9ab3b6" stroke-width="1.5"/>
+        <circle cx="327" cy="57" r="2.4" fill="#d8c18d"/>
+        <g fill="#dbe8e8" opacity=".7">
+          <path d="M0 -9L2 -3L8 -2L8 2L2 3L1 9L-1 9L-2 3L-8 2L-8 -2L-2 -3Z" transform="translate(130 58) rotate(90)"/>
+          <path d="M0 -9L2 -3L8 -2L8 2L2 3L1 9L-1 9L-2 3L-8 2L-8 -2L-2 -3Z" transform="translate(190 58) rotate(90)"/>
+          <path d="M0 -9L2 -3L8 -2L8 2L2 3L1 9L-1 9L-2 3L-8 2L-8 -2L-2 -3Z" transform="translate(250 58) rotate(90)"/>
+        </g>
+        <circle cx="405" cy="58" r="5" fill="none" stroke="#b9c9c8" stroke-opacity=".4"/>
+      </symbol>
+
+      <!-- 071 型综合登陆舰 -->
+      <symbol id="ship-071" viewBox="0 0 420 104">
+        <path d="M16 52L64 32" fill="none" stroke="url(#wakeGrad)" stroke-width="2"/>
+        <path d="M32 53L74 26L370 28L398 46L410 53L396 66L362 82L74 83Z" fill="url(#escortGrad)" stroke="#7b969b" stroke-opacity=".42"/>
+        <path d="M96 37H214L228 52L214 67H96Z" fill="#2e444a"/>
+        <path d="M222 34H322L338 52L322 70H222Z" fill="#2e444a"/>
+        <path d="M132 27H210V38H132Z" fill="#3b545a"/>
+        <path d="M178 27V16H190V27" fill="#3b545a"/>
+        <path d="M174 53H214" stroke="#6fe3e8" stroke-opacity=".35" stroke-width="2"/>
+        <rect x="250" y="40" width="54" height="24" fill="none" stroke="#9db4b7" stroke-opacity=".35"/>
+        <path d="M256 52H298M277 40V64" stroke="#9db4b7" stroke-opacity=".25"/>
+        <circle cx="348" cy="52" r="7" fill="none" stroke="#b9c9c8" stroke-opacity=".4"/>
+        <path d="M82 52H108" stroke="#9db4b7" stroke-opacity=".22"/>
+      </symbol>
+
+      <!-- 093 型攻击核潜艇 -->
+      <symbol id="sub-093" viewBox="0 0 300 70">
+        <path d="M18 36L78 36" stroke="url(#wakeGrad)" stroke-width="2"/>
+        <path d="M58 36C70 22 96 20 130 22L246 25C268 27 278 31 282 36C278 41 268 45 246 47L130 50C96 52 70 50 58 36Z" fill="#26363b" stroke="#7b969b" stroke-opacity=".5"/>
+        <path d="M128 24L142 11L164 12L170 24Z" fill="#33494f" stroke="#8fa8ac" stroke-opacity=".4"/>
+        <path d="M150 12V5M158 12V5" stroke="#8fa8ac" stroke-opacity=".6"/>
+        <path d="M74 36H110" stroke="#6fe3e8" stroke-opacity=".5"/>
+        <circle cx="262" cy="36" r="4" fill="none" stroke="#b9c9c8" stroke-opacity=".4"/>
+      </symbol>
+
+      <!-- 094 型战略核潜艇 -->
+      <symbol id="sub-094" viewBox="0 0 310 74">
+        <path d="M16 38L74 38" stroke="url(#wakeGrad)" stroke-width="2"/>
+        <path d="M54 38C68 23 96 21 132 23L252 26C274 28 286 32 290 38C286 44 274 48 252 50L132 53C96 55 68 53 54 38Z" fill="#26363b" stroke="#7b969b" stroke-opacity=".5"/>
+        <path d="M136 25L150 10L176 11L182 25Z" fill="#33494f" stroke="#8fa8ac" stroke-opacity=".4"/>
+        <path d="M158 10V3M168 10V3" stroke="#8fa8ac" stroke-opacity=".6"/>
+        <g fill="#1b2a2f" stroke="#6f898e" stroke-opacity=".4">
+          <rect x="190" y="28" width="28" height="8" rx="2"/>
+          <rect x="224" y="28" width="28" height="8" rx="2"/>
+        </g>
+        <path d="M72 38H114" stroke="#6fe3e8" stroke-opacity=".5"/>
+        <circle cx="270" cy="38" r="4" fill="none" stroke="#b9c9c8" stroke-opacity=".4"/>
+      </symbol>
+
+      <!-- 歼-15 -->
+      <symbol id="air-j15" viewBox="0 0 240 180">
+        <path d="M120 8C126 8 130 20 131 38L140 49L170 63L214 89L214 99L136 85L134 117L156 137L156 145L120 135L84 145L84 137L106 117L104 85L26 99L26 89L70 63L100 49L109 38C110 20 114 8 120 8Z" fill="currentColor"/>
+        <path d="M120 42V122" stroke="#061018" stroke-opacity=".35" stroke-width="2"/>
+        <path d="M108 28L120 18L132 28L120 36Z" fill="currentColor"/>
+      </symbol>
+
+      <!-- 歼-35 -->
+      <symbol id="air-j35" viewBox="0 0 240 180">
+        <path d="M120 14L132 47L162 59L214 89L214 99L134 87L132 119L152 137L152 145L120 136L88 145L88 137L108 119L106 87L26 99L26 89L78 59L108 47Z" fill="currentColor"/>
+        <path d="M120 44V120" stroke="#061018" stroke-opacity=".4" stroke-width="2"/>
+        <path d="M108 52H132M108 60H132" stroke="#061018" stroke-opacity=".3" stroke-width="2"/>
+      </symbol>
+
+      <!-- 空警-600 -->
+      <symbol id="air-kj600" viewBox="0 0 240 180">
+        <path d="M120 20L132 43V61L208 67V81L132 85V119L154 135V143L120 135L86 143V135L108 119V85L32 81V67L108 61V43Z" fill="currentColor"/>
+        <circle cx="120" cy="73" r="27" fill="none" stroke="currentColor" stroke-width="7" opacity=".85"/>
+        <path d="M120 46V100M93 73H147" stroke="currentColor" stroke-width="2" opacity=".45"/>
+        <circle cx="120" cy="73" r="5" fill="#061018"/>
+        <path d="M120 24V38" stroke="#061018" stroke-width="2" opacity=".35"/>
+      </symbol>
+
+      <!-- 直-20 -->
+      <symbol id="air-z20" viewBox="0 0 240 180">
+        <path d="M120 50C132 50 139 61 139 76V111L153 146V153L120 144L87 153V146L101 111V76C101 61 108 50 120 50Z" fill="currentColor"/>
+        <circle cx="120" cy="82" r="50" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".35" stroke-dasharray="2 7"/>
+        <g stroke="currentColor" stroke-width="5" stroke-linecap="round" opacity=".75">
+          <path d="M120 82V22"/><path d="M120 82L60 82"/><path d="M120 82L180 82"/>
+          <path d="M120 82L78 40"/><path d="M120 82L162 40"/><path d="M120 82L78 124"/><path d="M120 82L162 124"/>
+        </g>
+        <circle cx="120" cy="82" r="7" fill="#061018"/>
+        <path d="M104 60H136" stroke="#061018" stroke-opacity=".35" stroke-width="2"/>
+      </symbol>
+
+      <!-- 罗盘星徽 -->
+      <symbol id="emblem" viewBox="0 0 48 48">
+        <circle cx="24" cy="24" r="21.5" fill="none" stroke="currentColor" stroke-width="1"/>
+        <circle cx="24" cy="24" r="16" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-dasharray="1 4"/>
+        <path d="M24 7L27 19L39 24L27 29L24 41L21 29L9 24L21 19Z" fill="currentColor"/>
+        <circle cx="24" cy="24" r="2.5" fill="#04090e"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <!-- ── 顶部导航 ─────────────────────────────────────────── -->
+  <header class="site-header" id="siteHeader">
+    <a class="brand" href="#top" aria-label="深蓝档案首页">
+      <svg class="brand-mark" aria-hidden="true"><use href="#emblem"/></svg>
+      <span class="brand-text">
+        <strong>深蓝</strong>
+        <span>DEEP BLUE ARCHIVE</span>
+      </span>
+    </a>
+
+    <nav class="site-nav" id="siteNav" aria-label="主导航">
+      <a href="#fleet" data-nav="fleet"><span>01</span>航母图鉴</a>
+      <a href="#formation" data-nav="formation"><span>02</span>编队阵位</a>
+      <a href="#airwing" data-nav="airwing"><span>03</span>空中联队</a>
+      <a href="#timeline" data-nav="timeline"><span>04</span>航迹</a>
+    </nav>
+
+    <div class="header-meta">
+      <span class="live"><i></i>PUBLIC ARCHIVE</span>
+      <button class="music-toggle" id="musicToggle" aria-pressed="false" aria-label="播放原创配乐《向海》" title="原创海军氛围配乐（非军歌录音）">
+        <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <span class="music-label">原创配乐</span>
+      </button>
+      <time id="clock" datetime="">--:--:-- <small>CST</small></time>
+      <button class="menu-toggle" id="menuToggle" aria-controls="siteNav" aria-expanded="false" aria-label="打开导航">
+        <span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- ── HERO ──────────────────────────────────────────── -->
+    <section class="hero" id="top">
+      <div class="hero-bg" aria-hidden="true">
+        <div class="hero-glow"></div>
+        <div class="hero-grid"></div>
+        <div class="hero-rings"></div>
+        <div class="hero-horizon"></div>
+      </div>
+
+      <div class="hero-inner">
+        <div class="hero-copy">
+          <p class="eyebrow hero-reveal" style="--d:.05s"><span>PLAN · 001—003</span>中国航母公开档案</p>
+          <h1 class="hero-reveal" style="--d:.12s">
+            <span class="line">从近海</span>
+            <span class="line">到<span class="accent">深蓝</span></span>
+          </h1>
+          <p class="hero-sub hero-reveal" style="--d:.22s">
+            三艘航空母舰，三代技术跨越。以公开资料为坐标，走进中国航母编队的体系与航迹。
+          </p>
+          <div class="hero-actions hero-reveal" style="--d:.3s">
+            <a class="btn btn-primary" href="#formation">进入编队 <span class="arrow">↗</span></a>
+            <button class="btn btn-ghost" data-open-ship="fujian">福建舰档案</button>
+          </div>
+          <dl class="hero-stats hero-reveal" style="--d:.4s">
+            <div><dt>现役航母</dt><dd><span data-count="3">0</span><small>艘</small></dd></div>
+            <div><dt>首舰入列</dt><dd>2012</dd></div>
+            <div><dt>最大满载</dt><dd>8<small>万余吨</small></dd></div>
+          </dl>
+        </div>
+
+        <div class="hero-visual hero-reveal" style="--d:.28s" id="heroVisual">
+          <div class="radar">
+            <div class="radar-ring ring-1"></div>
+            <div class="radar-ring ring-2"></div>
+            <div class="radar-ring ring-3"></div>
+            <div class="radar-ticks" aria-hidden="true"></div>
+            <div class="radar-sweep"></div>
+            <div class="radar-cross"></div>
+
+            <svg class="hero-carrier" viewBox="0 0 1200 360" role="img" aria-label="航母编队示意">
+              <use href="#ship-carrier-ski"/>
+            </svg>
+
+            <div class="blip blip-a"><span></span><em>DDG</em></div>
+            <div class="blip blip-b"><span></span><em>FFG</em></div>
+            <div class="blip blip-c"><span></span><em>AOE</em></div>
+
+            <div class="radar-label l-top">CSG / 001</div>
+            <div class="radar-label l-bottom">SCREEN · 示意</div>
+            <div class="radar-scanline" aria-hidden="true"></div>
+          </div>
+
+          <div class="hero-readout readout-a"><span>03</span><small>CARRIERS<br>IN SERVICE</small></div>
+          <div class="hero-readout readout-b"><span>2012—2025</span><small>FROM SKI-JUMP<br>TO EMALS</small></div>
+        </div>
+      </div>
+
+      <div class="hero-foot">
+        <span class="scroll-cue"><i></i>SCROLL TO EXPLORE</span>
+        <span class="hero-foot-note">公开资料整理 · 编队构图为艺术示意</span>
+      </div>
+    </section>
+
+    <!-- ── 滚动信息条 ────────────────────────────────────── -->
+    <div class="ticker" aria-hidden="true">
+      <div class="ticker-track">
+        <span>辽宁舰 · CV-16</span><b>◆</b><span>山东舰 · CV-17</span><b>◆</b><span>福建舰 · CV-18</span><b>◆</b>
+        <span>歼-15 飞鲨</span><b>◆</b><span>歼-35</span><b>◆</b><span>空警-600</span><b>◆</b>
+        <span>055 型万吨大驱</span><b>◆</b><span>901 型综合补给舰</span><b>◆</b><span>向海图强</span><b>◆</b>
+        <span>辽宁舰 · CV-16</span><b>◆</b><span>山东舰 · CV-17</span><b>◆</b><span>福建舰 · CV-18</span><b>◆</b>
+        <span>歼-15 飞鲨</span><b>◆</b><span>歼-35</span><b>◆</b><span>空警-600</span><b>◆</b>
+        <span>055 型万吨大驱</span><b>◆</b><span>901 型综合补给舰</span><b>◆</b><span>向海图强</span><b>◆</b>
+      </div>
+    </div>
+
+    <!-- ── 01 航母图鉴 ───────────────────────────────────── -->
+    <section class="section fleet" id="fleet">
+      <div class="section-inner">
+        <header class="section-head">
+          <div>
+            <p class="section-index reveal">01 / FLEET</p>
+            <h2 class="reveal">三舰列阵</h2>
+          </div>
+          <p class="section-desc reveal">
+            从续建改造到自主建造，再到电磁弹射。三艘航母，标记出中国海军走向远海的三级台阶。
+            <span class="desc-note">点击舰卡查看完整档案</span>
+          </p>
+        </header>
+
+        <div class="carrier-grid">
+          <article class="carrier-card reveal" style="--i:0" data-open-ship="liaoning" tabindex="0" role="button" aria-label="查看辽宁舰档案">
+            <div class="card-top"><span class="card-code">CV-16</span><span class="status-pill"><i></i>现役</span></div>
+            <div class="card-art">
+              <div class="card-art-grid"></div>
+              <svg viewBox="0 0 1200 360" aria-hidden="true"><use href="#ship-carrier-ski"/></svg>
+            </div>
+            <div class="card-body">
+              <p class="card-kicker">001 型 · 滑跃起飞</p>
+              <h3>辽宁舰 <span>LIAONING</span></h3>
+              <p class="card-desc">中国第一艘航空母舰，由未完工的“瓦良格”号船体续建改造，实现从无到有的跨越。</p>
+              <ul class="mini-specs">
+                <li><strong>6.75</strong><span>万吨 · 满载</span></li>
+                <li><strong>304</strong><span>米 · 舰长</span></li>
+                <li><strong>2012</strong><span>年 · 入列</span></li>
+              </ul>
+              <span class="card-link">查看档案 <span>↗</span></span>
+            </div>
+          </article>
+
+          <article class="carrier-card reveal" style="--i:1" data-open-ship="shandong" tabindex="0" role="button" aria-label="查看山东舰档案">
+            <div class="card-top"><span class="card-code">CV-17</span><span class="status-pill"><i></i>现役</span></div>
+            <div class="card-art">
+              <div class="card-art-grid"></div>
+              <svg viewBox="0 0 1200 360" aria-hidden="true"><use href="#ship-carrier-ski"/></svg>
+            </div>
+            <div class="card-body">
+              <p class="card-kicker">002 型 · 滑跃起飞</p>
+              <h3>山东舰 <span>SHANDONG</span></h3>
+              <p class="card-desc">首艘完全自主设计建造的国产航母，突破船体结构与动力核心设备的关键技术。</p>
+              <ul class="mini-specs">
+                <li><strong>7</strong><span>万吨 · 满载</span></li>
+                <li><strong>315</strong><span>米 · 舰长</span></li>
+                <li><strong>2019</strong><span>年 · 入列</span></li>
+              </ul>
+              <span class="card-link">查看档案 <span>↗</span></span>
+            </div>
+          </article>
+
+          <article class="carrier-card carrier-card--key reveal" style="--i:2" data-open-ship="fujian" tabindex="0" role="button" aria-label="查看福建舰档案">
+            <div class="card-top"><span class="card-code">CV-18</span><span class="status-pill status-pill--gold"><i></i>现役</span></div>
+            <div class="card-art">
+              <div class="card-art-grid"></div>
+              <svg viewBox="0 0 1200 360" aria-hidden="true"><use href="#ship-carrier-cat"/></svg>
+            </div>
+            <div class="card-body">
+              <p class="card-kicker">003 型 · 电磁弹射</p>
+              <h3>福建舰 <span>FUJIAN</span></h3>
+              <p class="card-desc">首艘自主设计建造的电磁弹射型航母，让固定翼预警机与新一代舰载机上舰成为可能。</p>
+              <ul class="mini-specs">
+                <li><strong>8+</strong><span>万吨 · 满载</span></li>
+                <li><strong>320</strong><span>米 · 舰长</span></li>
+                <li><strong>2025</strong><span>年 · 入列</span></li>
+              </ul>
+              <span class="card-link">查看档案 <span>↗</span></span>
+            </div>
+          </article>
+        </div>
+
+        <div class="matrix reveal" role="region" aria-label="三艘航母参数对比">
+          <div class="matrix-row matrix-head">
+            <div class="matrix-label">参数 / 舰名</div>
+            <div>辽宁舰<span>CV-16</span></div>
+            <div>山东舰<span>CV-17</span></div>
+            <div class="matrix-key">福建舰<span>CV-18</span></div>
+          </div>
+          <div class="matrix-row">
+            <div class="matrix-label">入列时间</div>
+            <div>2012.09</div><div>2019.12</div><div class="matrix-key">2025.11</div>
+          </div>
+          <div class="matrix-row">
+            <div class="matrix-label">满载排水量</div>
+            <div>约 6.75 万吨</div><div>约 7 万吨</div><div class="matrix-key">8 万余吨</div>
+          </div>
+          <div class="matrix-row">
+            <div class="matrix-label">舰长</div>
+            <div>约 304 米</div><div>约 315 米</div><div class="matrix-key">约 320 米</div>
+          </div>
+          <div class="matrix-row">
+            <div class="matrix-label">起飞方式</div>
+            <div>滑跃起飞</div><div>滑跃起飞</div><div class="matrix-key">电磁弹射</div>
+          </div>
+          <div class="matrix-row">
+            <div class="matrix-label">动力</div>
+            <div>常规动力</div><div>常规动力</div><div class="matrix-key">常规动力 · 综合电力</div>
+          </div>
+        </div>
+        <p class="data-note reveal">参数均为公开资料估算值，不同来源存在差异，仅供科普参考。</p>
+      </div>
+    </section>
+
+    <!-- ── 02 编队阵位 ───────────────────────────────────── -->
+    <section class="section formation" id="formation">
+      <div class="section-inner section-inner--wide">
+        <header class="section-head">
+          <div>
+            <p class="section-index reveal">02 / FORMATION</p>
+            <h2 class="reveal">编队阵位</h2>
+          </div>
+          <p class="section-desc reveal">
+            航母从不孤舰作战。切换四种典型编成，点击舰艇查看角色档案；也可以进入三维沙盘观察阵位。
+            <span class="desc-note">拖动舰艇调整阵位 · 金色手柄旋转航向</span>
+          </p>
+        </header>
+
+        <div class="formation-presets reveal" id="formationPresets" role="tablist" aria-label="选择编队方案">
+          <button class="preset is-active" role="tab" aria-selected="true" data-formation="liaoning">
+            <span class="preset-no">01</span>
+            <span class="preset-copy"><strong>辽宁舰编队</strong><em>滑跃起飞 · 8 舰</em></span>
+            <span class="preset-tag">CSG</span>
+          </button>
+          <button class="preset" role="tab" aria-selected="false" data-formation="shandong">
+            <span class="preset-no">02</span>
+            <span class="preset-copy"><strong>山东舰编队</strong><em>远海部署 · 9 舰</em></span>
+            <span class="preset-tag">CSG</span>
+          </button>
+          <button class="preset" role="tab" aria-selected="false" data-formation="fujian">
+            <span class="preset-no">03</span>
+            <span class="preset-copy"><strong>福建舰编队</strong><em>电磁弹射 · 9 舰</em></span>
+            <span class="preset-tag">CSG</span>
+          </button>
+          <button class="preset preset--key" role="tab" aria-selected="false" data-formation="dual">
+            <span class="preset-no">04</span>
+            <span class="preset-copy"><strong>双航母联合编队</strong><em>多域联合 · 15 舰</em></span>
+            <span class="preset-tag">JOINT</span>
+          </button>
+        </div>
+
+        <div class="formation-shell reveal">
+          <div class="formation-toolbar">
+            <div class="toolbar-left">
+              <span class="toolbar-title">TACTICAL VIEW <em>/ <span id="viewLabel">二维阵位</span></em></span>
+              <div class="view-toggle" id="viewToggle" role="group" aria-label="切换阵位视图">
+                <button data-view="2d" class="is-active" aria-pressed="true">2D 阵位</button>
+                <button data-view="3d" aria-pressed="false">3D 沙盘</button>
+              </div>
+              <span class="toolbar-live"><i></i>SIMULATION</span>
+            </div>
+            <div class="toolbar-right">
+              <span class="layout-state" id="layoutState" role="status" aria-live="polite" hidden>阵位已修改</span>
+              <button class="scan-toggle layout-reset" id="resetFormation" hidden aria-label="恢复当前编队的默认阵位">恢复阵位</button>
+              <span class="toolbar-note" id="formationNote">非真实部署 · 不按比例</span>
+              <button class="scan-toggle" id="scanToggle" data-scanning="true" aria-label="暂停雷达扫描"><span class="scan-icon"></span><span id="scanLabel">暂停扫描</span></button>
+              <button class="scan-toggle orbit-toggle" id="orbitToggle" data-rotating="true" aria-label="暂停自动巡航" hidden><span class="orbit-icon"></span><span id="orbitLabel">自动巡航</span></button>
+            </div>
+          </div>
+
+          <div class="formation-grid">
+            <div class="map-wrap">
+              <div class="map-scroll" id="mapScroll">
+              <svg class="formation-map" id="formationMap" viewBox="0 0 1000 620" role="group" aria-label="航母编队阵位交互图">
+                <rect width="1000" height="620" fill="#041018"/>
+                <rect width="1000" height="620" fill="url(#mapGrid)"/>
+                <rect width="1000" height="620" fill="url(#mapGridBig)"/>
+
+                <g class="contours" fill="none" stroke="#5fa3b0" stroke-opacity=".1" stroke-width="1">
+                  <path d="M-40 510C80 470 130 520 230 490S390 410 520 450 720 540 880 500 1010 430 1080 450"/>
+                  <path d="M-40 545C90 505 150 550 250 522S410 448 540 485 730 570 890 535 1020 470 1080 490"/>
+                  <path d="M-30 145C90 100 170 155 260 132S420 58 540 95 720 185 870 155 1010 95 1060 110"/>
+                  <path d="M-30 112C100 70 180 120 270 100S430 30 550 62 730 150 880 122 1010 65 1060 78"/>
+                </g>
+
+                <g class="range-rings" fill="none" stroke="#6fe3e8" stroke-opacity=".16" stroke-dasharray="4 8">
+                  <circle cx="500" cy="305" r="128"/>
+                  <circle cx="500" cy="305" r="218"/>
+                  <circle cx="500" cy="305" r="305"/>
+                </g>
+                <g class="bearing-ticks" stroke="#6fe3e8" stroke-opacity=".2">
+                  <path d="M500 16V28M500 582V594M211 305H223M777 305H789"/>
+                  <path d="M296 101L304 109M696 501L704 509M704 101L696 109M304 501L296 509"/>
+                </g>
+                <text x="500" y="13" text-anchor="middle" class="map-axis">N</text>
+                <text x="500" y="610" text-anchor="middle" class="map-axis">S</text>
+
+                <g class="sweep" id="mapSweep">
+                  <path d="M500 305L500 25A280 280 0 0 1 742 165Z" fill="url(#sweepGrad)"/>
+                  <path d="M500 305L500 25" stroke="#6fe3e8" stroke-opacity=".35" stroke-width="1.5"/>
+                </g>
+                <circle class="ping ping-a" cx="500" cy="305" r="20" fill="none" stroke="#6fe3e8" stroke-opacity=".35"/>
+                <circle class="ping ping-b" cx="500" cy="305" r="20" fill="none" stroke="#6fe3e8" stroke-opacity=".25"/>
+
+                <g class="screen-arcs" fill="none" stroke="#c7a76a" stroke-opacity=".22" stroke-dasharray="2 8">
+                  <path d="M340 175C380 245 380 365 340 435"/>
+                  <path d="M660 175C620 245 620 365 660 435"/>
+                  <path d="M430 470C470 500 530 500 570 470"/>
+                </g>
+
+                <g id="mapShipsLayer"></g>
+
+                <g class="map-heading is-hidden" id="mapHeading" aria-label="拖动旋转所选舰艇航向">
+                  <title>拖动旋转航向</title>
+                  <line class="map-heading-line" x1="0" y1="0" x2="0" y2="0"/>
+                  <circle class="map-heading-knob" cx="0" cy="0" r="6.5"/>
+                  <circle class="map-heading-hit" cx="0" cy="0" r="16"/>
+                  <text class="map-heading-value" x="0" y="0" text-anchor="middle" dominant-baseline="middle">000°</text>
+                </g>
+
+                <g class="map-compass" transform="translate(940 78)">
+                  <circle r="30" fill="none" stroke="#6fe3e8" stroke-opacity=".18"/>
+                  <path d="M0 -24L5 0L0 24L-5 0Z" fill="#c7a76a" fill-opacity=".75"/>
+                  <path d="M-24 0L0 -5L24 0L0 5Z" fill="#6fe3e8" fill-opacity=".3"/>
+                  <text y="-35" text-anchor="middle" class="map-axis">N</text>
+                </g>
+
+                <g class="scale-bar" transform="translate(770 574)">
+                  <path d="M0 0H90" stroke="#8fb7c0" stroke-opacity=".5"/>
+                  <path d="M0 -4V4M45 -3V3M90 -4V4" stroke="#8fb7c0" stroke-opacity=".5"/>
+                  <text x="0" y="-10" fill="#8fb7c0" fill-opacity=".55" font-family="monospace" font-size="10">0</text>
+                  <text x="82" y="-10" fill="#8fb7c0" fill-opacity=".55" font-family="monospace" font-size="10">50 NM</text>
+                </g>
+              </svg>
+              </div>
+
+              <div class="sandbox" id="sandbox" hidden>
+                <canvas id="sandboxCanvas" aria-label="航母编队三维沙盘"></canvas>
+                <div class="sandbox-labels" id="sandboxLabels"></div>
+                <div class="sandbox-hud">
+                  <div class="sandbox-top">
+                    <span class="sandbox-kicker">3D TACTICAL SANDBOX</span>
+                    <span class="sandbox-net"><i></i>WEBGL</span>
+                  </div>
+                  <div class="sandbox-help">拖拽舰艇调整战位 · 空白处旋转 · 滚轮缩放</div>
+                  <div class="sandbox-status" id="sandboxStatus">08 CONTACTS · 1 CARRIER</div>
+                  <div class="sandbox-compass" aria-hidden="true">
+                    <span>N</span><i></i>
+                  </div>
+                  <div class="sandbox-actions">
+                    <button id="resetView" class="sandbox-btn">重置视角</button>
+                    <button id="autoRotate" class="sandbox-btn" data-on="true">自动巡航</button>
+                  </div>
+                  <div class="sandbox-scale">1 : 700 MODEL REFERENCE <span>/ 非实景比例</span></div>
+                </div>
+                <div class="sandbox-loader" id="sandboxLoader">
+                  <span class="loader-ring"></span>
+                  <strong>正在构建三维沙盘</strong>
+                  <em>BUILDING 3D FORMATION</em>
+                </div>
+                <div class="sandbox-fallback" id="sandboxFallback" hidden>
+                  <strong>当前浏览器未能启用 WebGL</strong>
+                  <span>可继续使用二维阵位查看编队构成。</span>
+                  <button id="fallback2d" class="sandbox-btn">返回二维阵位</button>
+                </div>
+              </div>
+
+              <div class="map-legend" id="mapLegend">
+                <span><i class="lg-carrier"></i>航母</span>
+                <span><i class="lg-surface"></i>水面护航</span>
+                <span><i class="lg-supply"></i>综合补给</span>
+              </div>
+              <div class="map-hint" id="mapHint">UNDERWAY <span>/ 航行中 · 拖拽舰艇调整阵位</span></div>
+            </div>
+
+            <aside class="ship-panel" id="shipPanel" aria-live="polite">
+              <div class="panel-head">
+                <span class="panel-code" id="panelCode">CV-16</span>
+                <span class="panel-role" id="panelRole">编队核心</span>
+              </div>
+              <div class="panel-art" id="panelArt"></div>
+              <h3 id="panelName">辽宁舰</h3>
+              <p class="panel-en" id="panelEn">LIAONING · 001 TYPE</p>
+              <p class="panel-desc" id="panelDesc"></p>
+              <dl class="panel-specs" id="panelSpecs"></dl>
+              <div class="panel-tags" id="panelTags"></div>
+              <div class="heading-control">
+                <div class="heading-top">
+                  <span>航向 / HEADING</span>
+                  <output id="headingValue" for="headingRange">355°</output>
+                </div>
+                <div class="heading-body">
+                  <button class="heading-step" id="headingMinus" aria-label="航向左转 5 度">−5°</button>
+                  <input type="range" id="headingRange" min="0" max="359" step="1" value="355" aria-label="舰艇航向角度">
+                  <button class="heading-step" id="headingPlus" aria-label="航向右转 5 度">+5°</button>
+                </div>
+                <p class="heading-hint">2D 手柄 / Q E 键 / 滑杆 · 3D 实时同步</p>
+              </div>
+              <div class="panel-foot">
+                <button class="panel-arrow" id="prevShip" aria-label="上一艘舰艇">←</button>
+                <span id="panelIndex">01 / 08</span>
+                <button class="panel-arrow" id="nextShip" aria-label="下一艘舰艇">→</button>
+              </div>
+              <button class="panel-open" id="panelOpen">打开完整档案 <span>↗</span></button>
+            </aside>
+          </div>
+        </div>
+        <p class="data-note reveal">典型编成仅用于展示航母编队的体系构成，舰名与阵位为公开资料基础上的艺术化组合，不代表真实任务编组。</p>
+
+        <div class="reference-block reveal">
+          <div class="reference-head">
+            <div>
+              <p class="section-index">REAL REFERENCES</p>
+              <h3>实景参考</h3>
+            </div>
+            <p>三维沙盘依据公开照片中的舰体比例、舰岛位置、甲板标线与涂装进行低多边形重建；照片用于参考与出处展示。</p>
+          </div>
+          <div class="reference-grid">
+            <a class="reference-card" href="https://commons.wikimedia.org/wiki/File:Aircraft_Carrier_Liaoning_CV-16.jpg" target="_blank" rel="noopener noreferrer">
+              <div class="reference-img"><img src="assets/refs/liaoning.webp" alt="辽宁舰在香港水域航行" loading="lazy"></div>
+              <div class="reference-cap"><strong>辽宁舰 · 香港水域</strong><span>Baycrest / CC BY-SA 2.5 ↗</span></div>
+            </a>
+            <a class="reference-card" href="https://commons.wikimedia.org/wiki/File:PLANS_Changsha_(DDG-173)_sail_with_PLANS_Shandong_(CV-17)_20231028.jpg" target="_blank" rel="noopener noreferrer">
+              <div class="reference-img"><img src="assets/refs/shandong-formation.webp" alt="山东舰与长沙舰在西太平洋航行" loading="lazy"></div>
+              <div class="reference-cap"><strong>山东舰与长沙舰 · 西太平洋</strong><span>日本防卫省统合幕僚监部 / CC BY 4.0 ↗</span></div>
+            </a>
+            <a class="reference-card" href="https://commons.wikimedia.org/wiki/File:Chinese_aircraft_carrier_Fujian_flight_deck.jpg" target="_blank" rel="noopener noreferrer">
+              <div class="reference-img"><img src="assets/refs/fujian-deck.webp" alt="福建舰飞行甲板与舰载机" loading="lazy"></div>
+              <div class="reference-cap"><strong>福建舰飞行甲板</strong><span>中国新闻社 / CC BY 4.0 ↗</span></div>
+            </a>
+          </div>
+          <p class="reference-note">图片来源：Wikimedia Commons · <a href="assets/refs/CREDITS.md" target="_blank" rel="noopener noreferrer">查看完整出处与许可</a>。模型为非官方艺术重建，不直接使用照片作为舰体 UV 贴图；甲板标线、涂装与比例参考上述公开影像。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 03 空中联队 ───────────────────────────────────── -->
+    <section class="section airwing" id="airwing">
+      <div class="section-inner">
+        <header class="section-head">
+          <div>
+            <p class="section-index reveal">03 / AIR WING</p>
+            <h2 class="reveal">空中联队</h2>
+          </div>
+          <p class="section-desc reveal">
+            航母的拳头在甲板之上。战斗机、预警机与直升机，把海上平台延伸为一座移动机场。
+            <span class="desc-note">机型构成为公开资料推测</span>
+          </p>
+        </header>
+
+        <div class="air-grid reveal">
+          <article class="air-card">
+            <div class="air-meta"><span>01</span><em>FIGHTER</em></div>
+            <div class="air-art"><svg viewBox="0 0 240 180" aria-hidden="true"><use href="#air-j15"/></svg></div>
+            <h3>歼-15 <span>飞鲨</span></h3>
+            <p class="air-en">J-15 · CARRIER FIGHTER</p>
+            <p class="air-desc">重型舰载战斗机，承担制空、反舰与对陆打击任务，是辽宁舰、山东舰的主力机型。</p>
+            <div class="air-tags"><span>滑跃 / 弹射</span><span>重型多用途</span></div>
+          </article>
+
+          <article class="air-card air-card--key">
+            <div class="air-meta"><span>02</span><em>STEALTH</em></div>
+            <div class="air-art"><svg viewBox="0 0 240 180" aria-hidden="true"><use href="#air-j35"/></svg></div>
+            <h3>歼-35 <span>隐身舰载机</span></h3>
+            <p class="air-en">J-35 · STEALTH FIGHTER</p>
+            <p class="air-desc">新一代隐身舰载战斗机，被认为将搭配福建舰的电磁弹射系统，提升编队突防能力。</p>
+            <div class="air-tags"><span>电磁弹射</span><span>隐身突防</span></div>
+          </article>
+
+          <article class="air-card">
+            <div class="air-meta"><span>03</span><em>AEW</em></div>
+            <div class="air-art"><svg viewBox="0 0 240 180" aria-hidden="true"><use href="#air-kj600"/></svg></div>
+            <h3>空警-600 <span>舰载预警机</span></h3>
+            <p class="air-en">KJ-600 · AEW&amp;C</p>
+            <p class="air-desc">固定翼舰载预警机，为编队提供远程空情探测与指挥引导，是弹射型航母的关键配套。</p>
+            <div class="air-tags"><span>固定翼预警</span><span>体系节点</span></div>
+          </article>
+
+          <article class="air-card">
+            <div class="air-meta"><span>04</span><em>ROTARY</em></div>
+            <div class="air-art"><svg viewBox="0 0 240 180" aria-hidden="true"><use href="#air-z20"/></svg></div>
+            <h3>直-20 <span>舰载直升机</span></h3>
+            <p class="air-en">Z-20 · NAVAL HELICOPTER</p>
+            <p class="air-desc">承担反潜、搜救、垂直补给与特战投送等任务，补齐编队近程反潜与勤务能力。</p>
+            <div class="air-tags"><span>反潜巡逻</span><span>多任务</span></div>
+          </article>
+        </div>
+
+        <div class="air-strip reveal">
+          <p>“从滑跃到弹射，从四代到五代，从单舰到体系。”</p>
+          <div class="air-strip-meta"><span>STOBAR</span><i></i><span>CATOBAR</span><i></i><span>5TH GEN</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 04 航迹 ───────────────────────────────────────── -->
+    <section class="section timeline" id="timeline">
+      <div class="section-inner">
+        <div class="timeline-layout">
+          <div class="timeline-intro">
+            <p class="section-index reveal">04 / TIMELINE</p>
+            <h2 class="reveal">向深蓝<br>的航迹</h2>
+            <p class="section-desc reveal">十余年，从一艘改装航母到三舰同框。每一步，都是工业能力与体系能力的叠加。</p>
+            <div class="timeline-stamp reveal">
+              <span>2012 — NOW</span>
+              <strong>14<small>年</small></strong>
+              <em>从首舰入列到三航母时代</em>
+            </div>
+          </div>
+
+          <ol class="t-list">
+            <li class="t-item reveal">
+              <div class="t-year">2012<span>09</span></div>
+              <div class="t-dot"></div>
+              <div class="t-content"><div class="t-head"><h3>辽宁舰入列</h3><span class="t-tag">起点</span></div><p>中国第一艘航空母舰正式服役，舷号 16，实现航母从无到有。</p></div>
+            </li>
+            <li class="t-item reveal">
+              <div class="t-year">2019<span>12</span></div>
+              <div class="t-dot"></div>
+              <div class="t-content"><div class="t-head"><h3>山东舰入列</h3><span class="t-tag">国产</span></div><p>首艘完全自主设计建造的国产航母交付，舷号 17，双航母格局形成。</p></div>
+            </li>
+            <li class="t-item reveal">
+              <div class="t-year">2022<span>06</span></div>
+              <div class="t-dot"></div>
+              <div class="t-content"><div class="t-head"><h3>福建舰下水</h3><span class="t-tag">跨越</span></div><p>首艘电磁弹射型航母在上海下水命名，舷号 18，跳过蒸汽弹射阶段。</p></div>
+            </li>
+            <li class="t-item reveal">
+              <div class="t-year">2024<span>05</span></div>
+              <div class="t-dot"></div>
+              <div class="t-content"><div class="t-head"><h3>福建舰首次海试</h3><span class="t-tag">试验</span></div><p>福建舰驶离码头开展首次航行试验，动力、电力与电磁弹射系统接受检验。</p></div>
+            </li>
+            <li class="t-item t-item--key reveal">
+              <div class="t-year">2025<span>11</span></div>
+              <div class="t-dot"></div>
+              <div class="t-content"><div class="t-head"><h3>福建舰入列</h3><span class="t-tag">三舰</span></div><p>福建舰在海南三亚正式入列，中国海军进入三航母时代。</p></div>
+            </li>
+            <li class="t-item t-item--now reveal">
+              <div class="t-year">NOW</div>
+              <div class="t-dot"></div>
+              <div class="t-content"><div class="t-head"><h3>体系成军</h3><span class="t-tag t-tag--live"><i></i>进行中</span></div><p>航母、驱逐舰、护卫舰、补给舰与舰载机共同构成远海作战体系，训练与部署走向常态化。</p></div>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 收束 ─────────────────────────────────────────── -->
+    <section class="closing">
+      <div class="closing-bg" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="closing-inner">
+        <p class="closing-kicker reveal">FROM NEAR SEAS TO BLUE WATER</p>
+        <h2 class="closing-title reveal">向海图强</h2>
+        <p class="closing-copy reveal">航母不是终点，而是一套体系的起点。<br>深蓝之上，航迹仍在延伸。</p>
+        <div class="closing-actions reveal">
+          <a class="btn btn-primary" href="#top">回到起点 <span class="arrow">↑</span></a>
+          <a class="btn btn-ghost" href="#fleet">重看图鉴</a>
+        </div>
+      </div>
+      <div class="closing-ships" aria-hidden="true">
+        <svg viewBox="0 0 1200 360"><use href="#ship-carrier-cat"/></svg>
+      </div>
+    </section>
+  </main>
+
+  <!-- ── 页脚 ───────────────────────────────────────────── -->
+  <footer class="site-footer">
+    <div class="footer-main">
+      <div class="footer-brand">
+        <svg class="brand-mark" aria-hidden="true"><use href="#emblem"/></svg>
+        <div><strong>深蓝档案</strong><span>DEEP BLUE ARCHIVE</span></div>
+        <p>一份关于中国航母编队的交互式公开科普档案。</p>
+      </div>
+      <nav class="footer-nav" aria-label="页脚导航">
+        <h3>浏览</h3>
+        <a href="#fleet">航母图鉴</a>
+        <a href="#formation">编队阵位</a>
+        <a href="#airwing">空中联队</a>
+        <a href="#timeline">航迹</a>
+      </nav>
+      <div class="footer-sources">
+        <h3>公开资料来源</h3>
+        <a href="https://news.cctv.com/2025/12/31/ARTIYkVu1bxY27PYW8mIUK07251231.shtml" target="_blank" rel="noopener noreferrer">央视新闻 · 三航母时代 ↗</a>
+        <a href="http://www.news.cn/milpro/20251111/572a1acc7ca84f3aa3eda2c6435bdf42/c.html" target="_blank" rel="noopener noreferrer">新华网 · 福建舰入列 ↗</a>
+        <a href="https://www.wenweipo.com/a/202206/18/AP62ace6d9e4b033218a52b598.html" target="_blank" rel="noopener noreferrer">香港文汇报 · 三艘航母比较 ↗</a>
+        <a href="assets/refs/CREDITS.md" target="_blank" rel="noopener noreferrer">实景图片许可与出处 ↗</a>
+        <a href="https://polyhaven.com/a/kloppenheim_06_puresky" target="_blank" rel="noopener noreferrer">HDRI · Poly Haven (CC0) ↗</a>
+      </div>
+      <div class="footer-meta">
+        <h3>档案信息</h3>
+        <p>数据截至 2026.11<br>版本 1.0 / CONCEPT</p>
+        <span class="footer-status"><i></i>PUBLIC RELEASE</span>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>本页面为非官方科普概念作品，参数为公开资料估算，编队构图为艺术示意，不代表真实部署或官方立场。配乐为原创合成《向海》，不含军歌录音。</p>
+      <p>© <span id="year">2026</span> DEEP BLUE ARCHIVE</p>
+    </div>
+  </footer>
+
+  <!-- ── 舰船档案弹层 ───────────────────────────────────── -->
+  <dialog class="dossier" id="dossier" aria-labelledby="dossierTitle">
+    <div class="dossier-scroll">
+      <div class="dossier-top">
+        <span>SHIP DOSSIER <em>/ 舰船档案</em></span>
+        <button class="dossier-close" id="dossierClose" aria-label="关闭档案">关闭 <span>✕</span></button>
+      </div>
+      <div class="dossier-body">
+        <div class="dossier-visual">
+          <div class="dossier-art"><svg id="dossierArt" viewBox="0 0 1200 360" aria-hidden="true"><use href="#ship-carrier-ski" id="dossierUse"/></svg></div>
+          <div class="dossier-visual-meta">
+            <span id="dossierClass">001 型航空母舰</span>
+            <span id="dossierCode">CV-16</span>
+          </div>
+        </div>
+        <div class="dossier-info">
+          <p class="dossier-kicker" id="dossierEn">LIAONING · TYPE 001</p>
+          <h2 id="dossierTitle">辽宁舰</h2>
+          <p class="dossier-role" id="dossierRole">编队核心 / 航空作战</p>
+          <p class="dossier-desc" id="dossierDesc"></p>
+          <dl class="dossier-specs" id="dossierSpecs"></dl>
+          <div class="dossier-airwing" id="dossierAirwing"></div>
+        </div>
+      </div>
+      <div class="dossier-bottom">
+        <p>公开资料整理 · 参数为估算值 · 仅作科普展示</p>
+        <button class="dossier-return" id="dossierReturn">返回档案库 ←</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
